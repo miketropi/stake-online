@@ -1,0 +1,8 @@
+#     ,------ MINUTE
+#    / ,----- HOUR
+#   / / ,---- DAY OF MONTH
+#  / / / ,--- MONTH
+# / / / / ,-- DAY OF WEEK
+#/ / / / /
+* * * * * /usr/local/bin/php -d register_argc_argv=On /var/www/html/artisan schedule:run
+#

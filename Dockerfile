@@ -18,6 +18,10 @@ RUN apt-get install -y \
     libfreetype6-dev \
     libzip-dev \
     libonig-dev \
+    curl \
+    libcurl4 \
+    libcurl4-openssl-dev \
+    cron \
     g++
 
 # 2. apache configs + document root
@@ -40,7 +44,8 @@ RUN docker-php-ext-install \
     calendar \
     mbstring \
     pdo_mysql \
-    zip
+    zip \
+    curl
 
 # 5. composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -52,3 +57,22 @@ ARG uid
 RUN useradd -G www-data,root -u $uid -d /home/devuser devuser
 RUN mkdir -p /home/devuser/.composer && \
     chown -R devuser:devuser /home/devuser
+
+# 7. Cron 
+RUN cp /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
+    echo "Europe/Rome" > /etc/timezone
+
+# Copy cron file to the cron.d directory
+COPY cron /etc/cron.d/cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/cron
+
+# Apply cron job
+RUN crontab /etc/cron.d/cron
+
+# Create the log file to be able to run tail
+RUN mkdir -p /var/log/cron
+
+# Add a command to base-image entrypont scritp
+RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground

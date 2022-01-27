@@ -12,6 +12,7 @@ services:
       - APACHE_RUN_GROUP=#${UID}
     volumes:
       - .:/var/www/html
+      - ./log/cron:/var/log/cron
     ports:
       - 8000:80
     networks:
